@@ -12,26 +12,30 @@ public class Main {
 
 	public static ObjectMapper mapper = new ObjectMapper();
 
-	public static void main(String[] args) throws IOException {
-		CloseableHttpClient httpClient = HttpClientBuilder.create()
-				.setDefaultRequestConfig(RequestConfig.custom()
-						.setConnectTimeout(5000)
-						.setSocketTimeout(30000)
-						.setRedirectsEnabled(false)
-						.build())
-				.build();
+	public static void main(String[] args) {
 
-		HttpGet request = new HttpGet("https://raw.githubusercontent.com/netology-code/jd-homeworks/master/http/task1/cats");
+		try (CloseableHttpClient httpClient = HttpClientBuilder.create()
+						.setDefaultRequestConfig(RequestConfig.custom()
+								.setConnectTimeout(5000)
+								.setSocketTimeout(30000)
+								.setRedirectsEnabled(false)
+								.build())
+						.build();) {
 
-		CloseableHttpResponse response = httpClient.execute(request);
+			HttpGet request = new HttpGet("https://raw.githubusercontent.com/netology-code/jd-homeworks/master/http/task1/cats");
 
-		List<Cats> cats = mapper.readValue(
-				response.getEntity().getContent(),
-				new TypeReference<>() {
-				}
-		);
-		cats.stream().filter(value -> value.getUpvotes() > 0).forEach(System.out::println);
-		response.close();
-		httpClient.close();
+			CloseableHttpResponse response = httpClient.execute(request);
+
+			List<Cats> cats = mapper.readValue(
+					response.getEntity().getContent(),
+					new TypeReference<>() {
+					}
+			);
+			cats.stream().filter(value -> value.getUpvotes() > 0).forEach(System.out::println);
+			response.close();
+
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
 	}
 }
